@@ -18,6 +18,7 @@ add_shortcode('mw_find_patient', 'mediweight_find_patient' );
 add_shortcode('mw_find_patient_2', 'mediweight_find_patient_2' );
 add_shortcode('mw_create_patient', 'mediweight_create_patient' );
 add_shortcode('mw_add_product_to_patient', 'mediweight_add_product_to_patient' );
+add_shortcode('mw_list_quotes', 'mediweight_list_quotes' );
 
 
 
@@ -342,6 +343,58 @@ function mediweight_product(){
 
 	return $listStr;
 }
+
+function mediweight_list_quotes(){
+    ob_start();
+ 
+	$db=db_connect(); 
+
+	$query = "SELECT quote.orderdate, cpr, patient.name, quote.amount, product.name AS prod, product.description
+			FROM quote
+			INNER JOIN patient ON quote.patientId = patient.cpr
+			INNER JOIN product ON quote.productId = product.productId
+		WHERE closed = 0";
+	?>
+
+	<table>
+		<tr>
+			<td>Dato</td>
+			<td>CPR</td>
+			<td>Navn</td>
+			<td>Mængde</td>
+			<td>Produkt</td>
+			<td>Beskrivelse</td>
+
+		</tr>
+	
+	<?php
+	if ($result=$db->query($query)){
+		while ($row = $result->fetch_assoc()){
+			echo "<tr>";
+			echo "<td>" . $row['orderdate'] . "</td>";
+			echo "<td>" . $row['cpr'] . "</td>";
+			echo "<td>" . $row['name'] . "</td>";
+			echo "<td>" . $row['amount'] . "</td>";
+			echo "<td>" . $row['prod'] . "</td>";
+			echo "<td>" . $row['description'] . "</td>";				
+				echo "</tr>";
+		}	
+		$result->free();		
+	}
+	?>
+	
+	</table>
+
+	<?php
+	$db->close();
+
+ 
+	$listStr = ob_get_contents();
+	ob_end_clean();
+	
+	return $listStr;
+}
+
 
 function mediweight_list_products(){
     ob_start();
