@@ -193,8 +193,11 @@ function mediweight_find_patient(){
 		Telefonnummer:
 		<input name="phone" type="text" id="phone" value="<?php echo $row['phone']; ?>" />
 		<br><br>
-		Produkter:
+		Produkttype:
 		<input name="products" type="text" id="products" value="<?php echo $row['product']; ?>" />
+		<br><br>
+		Antal produkter på lager:
+		<input name="stock" type=text" id="instock" value="<?php echo $row['inStock']; ?>" />
 		<input name="searchcpr" type="hidden" id="searchcpr" value="<?php echo $row['cpr']; ?>" />
 		<input name="shouldupdate" type="hidden" id="shouldupdate" value="<?php echo $USER_CRUD_UPDATE;?>" />	
 		<br><br>
@@ -347,9 +350,15 @@ function mediweight_product(){
 function mediweight_list_quotes(){
     ob_start();
  
-	$db=db_connect(); 
+	$db=db_connect();
 
-	$query = "SELECT quote.orderdate, cpr, patient.name, quote.amount, product.name AS prod, product.description
+	$closedId=$_REQUEST['closed']; 	
+	if($closedId > 0){
+		$closeSQL="UPDATE quote SET closed = 1 WHERE id = $closedId";
+		$db->query($closeSQL);
+	} 
+
+	$query = "SELECT quote.id, quote.orderdate, cpr, patient.name, quote.amount, product.name AS prod, product.description
 			FROM quote
 			INNER JOIN patient ON quote.patientId = patient.cpr
 			INNER JOIN product ON quote.productId = product.productId
@@ -364,7 +373,7 @@ function mediweight_list_quotes(){
 			<td>Mængde</td>
 			<td>Produkt</td>
 			<td>Beskrivelse</td>
-
+			<td></td>
 		</tr>
 	
 	<?php
@@ -377,7 +386,8 @@ function mediweight_list_quotes(){
 			echo "<td>" . $row['amount'] . "</td>";
 			echo "<td>" . $row['prod'] . "</td>";
 			echo "<td>" . $row['description'] . "</td>";				
-				echo "</tr>";
+			echo "<td> <form method='post' action=''><input type='hidden' name='closed' id='closed' value='". $row['id'] ."'> <button type='submit'>Afsend</button></form> </td>";				
+			echo "</tr>";
 		}	
 		$result->free();		
 	}

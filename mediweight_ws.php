@@ -13,25 +13,16 @@
 
 	$json=$_REQUEST['json'];
 	$decodedJson=json_decode($json);
-	echo "<pre>";
-	echo $decodedJson->{'function'};
-	echo $decodedJson->{'patientId'};
-	echo $decodedJson->{'prodId'};
-	echo $decodedJson->{'instock'};
-	echo "<pre>";
 
 	if ($decodedJson->{'function'} == 'update'){
-		$updateSql = "UPDATE patient SET product = " . $decodedJson->{'instock'}  . "  WHERE id = " . $decodedJson->{'patientId'};	
+		$updateSql = "UPDATE patient SET inStock = '" . $decodedJson->{'instock'}  . "'  WHERE cpr = '" . $decodedJson->{'patientId'} ."';";	
 		$db->query($updateSql);
+		echo "OK";
 	}else if ($decodedJson->{'function'} == 'order'){
-                $orderSql = ""};
-                $db->query($orderSql);
+                $orderSql = "INSERT INTO quote (patientId, productId, amount) VALUES  ('" .  $decodedJson->{'patientId'} . "', '" .  $decodedJson->{'prodId'} . "', '" . $decodedJson->{'amount'}."');";
+        	$db->query($orderSql);	
+		echo "OK";
         }
 
 	$db->close();
-
-
-
-
-
 ?>
